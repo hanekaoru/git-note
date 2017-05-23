@@ -362,9 +362,8 @@ git merge test  // 用于合并 指定的分支 到 当前的分支
 
 合并之后再次查看文件内容就会发现，现在 master 分支和 test 分支最新提交是完全一样的了
 
-* Fast-forward
+> 控制台当中的 Fast-forward 提示，指的是这次合并是 "快进模式"，即直接把 master 指向 test 当前的提交
 
-指的是这次合并是 "快进模式"，即直接把 master 指向 test 当前的提交
 
 这时候就可以放心删除 test 分支了
 
@@ -386,4 +385,53 @@ git branch -b <name>  // 创建 + 切换 分支
 git merge <name>      // 合并某分支到当前分支 
 
 git barnch -d <name>  // 删除分支  
+```
+
+
+#### 冲突解决
+
+如果在发生合并的时候发生冲突，类似下面：
+
+```js
+$ git merge test1
+Auto-merging test.txt
+CONFLICT (content): Merge conflict in test.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+这个时候就需要手动解决冲突以后再次提交，使用 git status 命令可以告诉我们冲突的文件：
+
+```js
+#  ...
+#
+#       both modified:      test.txt
+#
+#  ...
+```
+
+git 使用 ```<<<<<<<```，```=======```，```>>>>>>>``` 标记出不同分支的内容，修改以后在保存提交
+
+```js
+git add test.txt
+
+git commit -m "xxxxx"
+```
+
+合并完成后就可以删除掉 test1 分支了
+
+> 使用 ```git log --graph``` 命令可以查看分支合并图
+
+> 在手动修改冲突文件以后（其实不改也行就是确认一下），再次 ```add and commit```，系统就确认那个是最新（merge 后）的版本了
+
+
+#### 分支管理
+
+一般在合并分支的时候，git 会默认优先使用 Fast forward 模式，但这种模式下删除分支后，会丢掉分支信息
+
+这个时候就可以使用 ```--no-ff``` 参数，这时的 git 会在 merge 的时候生成一个新的 commit 记录，这样一来就可以从分支历史上看到所有的分支信息了
+
+```js
+// --no-ff 参数，表示禁用 Fast forward
+// 又因为合并要创建一个新的 commit，所以加上 -m 参数，把描述写进去
+git merge --no-ff -m "msg" test  
 ```
