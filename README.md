@@ -258,22 +258,22 @@ HEAD 严格来说不是指向提交，而是指向 master，master 才是指向�
 ○ -- ○ -- ○ -- ○      <== 主分支（master）
 ```
 
-当我们创建新的分支，比如名称为 dev，这个时候 git 会新建了一个名为 dev 的指针指向 master 相同的提交
+当我们创建新的分支，比如名称为 test，这个时候 git 会新建了一个名为 test 的指针指向 master 相同的提交
 
-然后再把 HEAD 指向 dev，表示当前分支在 dev 上
+然后再把 HEAD 指向 test，表示当前分支在 test 上
 
 
 ```js
-             master -- HEAD
+             master 
                |
                |
 ○ -- ○ -- ○ -- ○      <== 主分支（master）
                |
                |
-              dev -- HEAD
+             test -- HEAD
 ```
 
-这个时候开始，对于工作区的修改和提交都是针对 dev 分支了，每提交一次，dev 分支就前进一步，而 master 保持不变
+这个时候开始，对于工作区的修改和提交都是针对 test 分支了，每提交一次，test 分支就前进一步，而 master 保持不变
 
 ```js
              master
@@ -282,10 +282,10 @@ HEAD 严格来说不是指向提交，而是指向 master，master 才是指向�
 ○ -- ○ -- ○ -- ○ -- ○ -- ○     <== 主分支（master）
                          |
                          |
-                        dev -- HEAD
+                        test -- HEAD
 ```
 
-当 dev 分支上的工作完成以后，就可以直接把 master 指向 dev，即把 dev 合并到 master 上，这样就完成了合并
+当 test 分支上的工作完成以后，就可以直接把 master 指向 test，即把 test 合并到 master 上，这样就完成了合并
 
 ```js
                        master -- HEAD
@@ -294,14 +294,96 @@ HEAD 严格来说不是指向提交，而是指向 master，master 才是指向�
 ○ -- ○ -- ○ -- ○ == ○ == ○     <== 主分支（master）
                          |
                          |
-                        dev 
+                        test 
 ```
 
-合并完成后，可以选择删除掉 dev 分支，这样就仅剩一条 master 分支了
+合并完成后，可以选择删除掉 test 分支，这样就仅剩一条 master 分支了
 
 ```js
                        master -- HEAD
                          |
                          |
 ○ -- ○ -- ○ -- ○ == ○ == ○     <== 主分支（master）
+```
+
+
+#### 操作分支
+
+首先创建并切换到 test 分支
+
+```js
+// 创建并切换到 test 分支，-b 命令表示创建并且切换
+git checkout -b test
+```
+
+相当于下面两条命令
+
+```js
+git branch test 
+
+git checkout test  // 切换分支
+```
+
+使用下面命令可以查看当前分支，并且会列出所有的分支，当前分支前面会标一个 ```*``` 号
+
+```js
+git branch
+```
+
+这个时候修改文件，然后 add 和 commit 以后在切换回 master 分支会发现看不到我们修改的内容，因为这一次的提交是在 test 分支上
+
+此时状态如下
+
+```js
+git add test.txt
+
+git commit -m "xxx"
+
+git checkout master
+
+git branch
+
+// ---------------------------------------------
+
+                  master -- HEAD
+                    |
+                    |
+○ -- ○ -- ○ -- ○ -- ○ == ○     <== 主分支（master）
+                         |
+                         |
+                        test 
+```
+
+这个时候就需要合并分支了
+
+```js
+git merge test  // 用于合并 指定的分支 到 当前的分支
+```
+
+合并之后再次查看文件内容就会发现，现在 master 分支和 test 分支最新提交是完全一样的了
+
+* Fast-forward
+
+指的是这次合并是 "快进模式"，即直接把 master 指向 test 当前的提交
+
+这时候就可以放心删除 test 分支了
+
+```js
+git baranch -d dev
+```
+
+分支操作总结如下：
+
+```js
+git branch            // 查看分支
+
+git branch <name>     // 创建分支
+
+git checkout <name>   // 切换分支
+
+git branch -b <name>  // 创建 + 切换 分支
+
+git merge <name>      // 合并某分支到当前分支 
+
+git barnch -d <name>  // 删除分支  
 ```
