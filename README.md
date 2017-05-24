@@ -507,3 +507,81 @@ git merge --no-ff -m "merge-test" test
 git branch -d test
 
 ```
+
+
+
+#### 多人协作
+
+工作模式通常是这样：
+
+* 首先可以试图使用 ```git push origin branch-name``` 推送自己的修改
+
+* 如果推送失败，则因为远程分支比你的本地更新，需要先用 ```git pull``` 拉取最新版本（如果有冲突，则解决冲突，并在本地提交）
+
+* 没有冲突或者解决掉冲突后，再用 ```git push origin branch-name``` 推送就能成功
+
+* 如果 ```git pull``` 提示 ````no tracking information```，则说明本地分支和远程分支的链接关系没有创建，用命令 ```git branch --set-upstream branch-name origin/branch-name```
+
+
+
+
+
+
+
+
+
+
+## 标签管理
+
+
+#### 创建标签
+
+```js
+// 创建标签，默认是打在最新的 commit 上
+git tag <name>  // git tag v1.0
+
+// 查看所有标签
+git tag 
+
+
+// 如果之前忘记打标签
+git tag <name> <commit_id>  // git tag v0.9 0e3s452
+
+
+// 标签不是按时间顺序排列的，而是按字母顺序
+// 查看标签信息
+git show <tag_name>  // git show v0.9
+
+// 还可以创建带有说明的标签，-a 指定标签名，-m 指定说明文字
+git tag -a v0.9 -m "xxxx"
+```
+
+
+#### 标签操作
+
+```js
+// 删除标签
+git tag -d v1.0
+```
+
+默认创建的标签只会存储在本地，不会自动推送到远程，所以，打错的标签可以在本地安全删除
+
+如果要推送标签
+
+```js
+// 推送标签到远程
+git push origin <tagname>  // git push origin v1.0
+
+// 或者一次性的推送全部尚未推送到远程的本地标签
+git push origin --tags
+```
+
+如果标签已经推送到远程，还是想要删除的话：
+
+```js
+// 需要先从本地删除
+git tag -d v1.0
+
+// 然后再从远程删除，删除的命令也是 push，格式如下
+git push origin :refs/tags/v1.0
+```
