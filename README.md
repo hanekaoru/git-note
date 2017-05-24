@@ -368,7 +368,7 @@ git merge test  // 用于合并 指定的分支 到 当前的分支
 这时候就可以放心删除 test 分支了
 
 ```js
-git baranch -d dev
+git baranch -d test
 ```
 
 分支操作总结如下：
@@ -434,4 +434,76 @@ git commit -m "xxxxx"
 // --no-ff 参数，表示禁用 Fast forward
 // 又因为合并要创建一个新的 commit，所以加上 -m 参数，把描述写进去
 git merge --no-ff -m "msg" test  
+```
+
+
+#### Bug 分支
+
+在 git 中，每个 bug 都可以通过一个新的临时分支来修复，修复后，合并分支，然后将临时分支删除
+
+但是如果手头上的工作还没有完成，还没法提交，这个时候就可以用到 stash 功能，可以把工作区临时 "储存" 起来，等 bug 修改完毕了在来继续工作
+
+解决完 bug 之后，可以使用 ```git stash list``` 来查看之前储存的工作区
+
+想要恢复有两种方式
+
+* 一种是使用 ```git stash apply``` 来恢复，但是恢复后，stash 内容并没有删除，需要再次使用 ```git stash drop``` 来删除
+
+* 另外一种是使用 ```git stash pop```，在恢复的同时把 stash 的内容也删除了
+
+这个时候再用 ```git stash list``` 查看，就看不到任何 ```stash``` 内容了
+
+简单来说就是：
+
+* 在分支 test 正常开发，这时有一个 bug 需要解决，需要先把 test 分支储存起来（stash）
+
+* 在 master 下新建一个 issue-bug01 分支，解决 bug，成功后在 master 下合并 issue-bug01
+
+* 然后在 test 下合并 master，这样才会同步里面的 bug 解决方案
+
+* 然后恢复 test（stash pop），这时系统自动合并，会提示有冲突，因为储存了之前 test 中的东西，此时需要手动去解决冲突
+
+* 冲突解决完成后，继续开发 test，最后 add commit，最后的最后，在 master 下合并完成后的 test 分支
+
+```js
+// 当前正在 test 分支开发，需要 bug 先保存起来
+git stash
+
+// 去 master 分支建立 bug 分支
+git checkout master
+
+git checkout -b issue-bug01
+
+// 然后去修改 bug
+git add xxx / git commit -m "xxxx"
+
+// master 合并
+git checkout master
+
+git merge --no-ff -m "merge-issue-bug01" issue-bug01
+
+// test 合并
+git checkout test
+
+git merge --no-ff -m "merge-test" master
+
+git stash pop
+
+// 这时会提示冲突，去文件手动改正
+#       Auto-merging xxx
+#       CONFLICT (content): Merge conflict in xxx
+
+// 完成后继续开发分支 test
+git add xxx
+
+git comit -m "xxx"
+
+// 分支完成后合并
+git checkout master
+
+git merge --no-ff -m "merge-test" test
+
+// 最后删除分支
+git branch -d test
+
 ```
